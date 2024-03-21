@@ -1,6 +1,6 @@
 employees = {
     1: {
-        'name': 'Ирина Кирчева',
+        'name': 'Irina Kircheva',
         'position': 'Специалист по кадрови въпроси',
         'born_after_31.12.1959': True,
         'contact': False,
@@ -8,7 +8,7 @@ employees = {
         'monthly_salary_in_leva': 0,
     },
     2: {
-        'name': 'Генка Рафаилова',
+        'name': 'Genka Rafailova',
         'position': 'Специалист по кадрови въпроси',
         'born_after_31.12.1959': True,
         'contact': True,
@@ -16,7 +16,7 @@ employees = {
         'monthly_salary_in_leva': 3000,
     },
     3: {
-        'name': 'Даниела Чонкова',
+        'name': 'Daniela Chonkova',
         'position': 'Специалист по кадрови въпроси',
         'born_after_31.12.1959': False,
         'contact': False,
@@ -24,7 +24,7 @@ employees = {
         'monthly_salary_in_leva': 0,
     },
     4: {
-        'name': 'Мария Златева',
+        'name': 'Maria Zlateva',
         'position': 'Специалист по кадрови въпроси',
         'born_after_31.12.1959': False,
         'contact': True,
@@ -42,16 +42,19 @@ years = [
 ]
 
 months = [
-    'януари',
-    'февруари',
-    'март',
-    'април',
-    'май',
-    'юни',
-    'юли',
-    'август',
-    'септември',
-    'октомври',
-    'ноември',
-    'декември',
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
 ]
+
+column_of_month_in_common_timesheets_file = 24
+column_of_year_in_common_timesheets_file = 30

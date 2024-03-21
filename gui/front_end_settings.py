@@ -21,8 +21,8 @@ default_status_text = 'Статус: готов'
 # button names -------------------------------------------------------------------------
 name_of_browse_label1 = 'Път към проекта: няма'
 name_of_browse_button1 = 'Избери пътя към проекта'
-name_of_button1 = 'Бутон 1 <A>'
-name_of_button2 = 'Бутон 2 <S>'
+name_of_button1 = 'Зареди <A>'
+name_of_button2 = 'Сравни <S>'
 name_of_button3 = 'Изчисти <D>'
 
 
@@ -34,7 +34,7 @@ shortcut_button_height = 1
 shortcut_button_relief = 'flat'
 shortcut_button_cursor = 'hand2'
 work_button_width = 25
-work_button_height = 2
+work_button_height = 1
 
 
 # label settings -----------------------------------------------------------------------
@@ -50,7 +50,7 @@ status_label_foreground_color = '#444444'
 
 # lights settings ----------------------------------------------------------------------
 light_width = 15
-light_height = 60
+light_height = 25
 # light_background_color = '#E5E5E5'
 light_background_color = '#7E969C'
 light_fill_color_neutral = 'dark gray'

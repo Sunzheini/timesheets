@@ -51,6 +51,7 @@ class MyGui:
         # Internal objects
         # -----------------------------------------------------------------------------
         self.contents_of_status_label = self.DEFAULT_STATUS_TEXT
+        self.selected_path = None
 
         # -----------------------------------------------------------------------------
         # Names of elements
@@ -134,7 +135,7 @@ class MyGui:
         self.work_button_2.config(command=self.commands_bound_to_work_button_2)
         self.work_button_3.config(command=self.commands_bound_to_work_button_3)
 
-        self.work_button_1.place(x=10, y=data_section_height+155)
+        self.work_button_1.place(x=10+570, y=data_section_start_y+1)
         self.work_button_2.place(x=295, y=data_section_height+155)
         self.work_button_3.place(x=580, y=data_section_height+155)
 
@@ -151,7 +152,7 @@ class MyGui:
         self.canvas1, self.canvas2, self.canvas3, self.rect1, self.rect2, self.rect3 = (
             apply_light_next_to_work_buttons(self.window))
 
-        self.canvas1.place(x=195, y=data_section_height+155)
+        self.canvas1.place(x=195+570, y=data_section_start_y+1)
         self.canvas2.place(x=480, y=data_section_height+155)
         self.canvas3.place(x=765, y=data_section_height+155)
 
@@ -197,9 +198,9 @@ class MyGui:
         else:
             filepath = path
 
-        label_number = self.browse_label_1
-        self.update_label_next_to_browse_button(label_number, f"{filepath}")
-        self.update_status_label(f"Избрано: '{filepath}'")
+        self.selected_path = filepath
+        self.update_label_next_to_browse_button(self.browse_label_1, f"{self.selected_path}")
+        self.update_status_label(f"Избрано: '{self.selected_path}'")
 
     @staticmethod
     def update_label_next_to_browse_button(label_number, text):
@@ -227,9 +228,9 @@ class MyGui:
 
         # if there is an additional message, show it
         if additional_message is not None:
-            self.update_status_label(f"Избрано: '{return_result}'\n{additional_message}")
+            self.update_status_label(f"'{return_result}'\n{additional_message}")
         else:
-            self.update_status_label(f"Резултат: '{return_result}'")
+            self.update_status_label(f"'{return_result}'")
 
     # -----------------------------------------------------------------------------
     # Methods on work buttons
@@ -243,7 +244,12 @@ class MyGui:
         :return: None
         """
         # execute functions and get the result, color and additional message if any
-        request_info = None
+        request_info = (
+            self.selected_option1.get(),
+            self.selected_option2.get(),
+            self.selected_option3.get(),
+            self.selected_path,
+        )
         try:
             return_result, status_color, additional_message = self.engine_object.methods_bound_to_button_1(request_info)
         except Exception as e:
@@ -254,9 +260,9 @@ class MyGui:
 
         # if there is an additional message, show it
         if additional_message is not None:
-            self.update_status_label(f"Операция 1: '{return_result}'\n{additional_message}")
+            self.update_status_label(f"'{return_result}'\n{additional_message}")
         else:
-            self.update_status_label(f"Операция 1: '{return_result}'")
+            self.update_status_label(f"'{return_result}'")
 
     @time_measurement_decorator
     def commands_bound_to_work_button_2(self, event=None):
