@@ -18,3 +18,12 @@ def get_path_of_related_common_timesheets_file(year, folder_path):
             return os.path.join(folder_path, file)
     return 'Error: Could not find the timesheets file for the given year'
 
+
+def get_path_of_related_project_file(project_name, folder_path):
+    files_in_the_folder = get_list_of_all_files_in_a_folder(folder_path)
+
+    # check file name for project name
+    for file in files_in_the_folder:
+        if project_name.lower() in file.lower() and '.xlsx' in file:
+            return os.path.join(folder_path, file)
+    return 'Error: Could not find the project file for the given project'

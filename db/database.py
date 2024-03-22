@@ -56,5 +56,20 @@ months = [
     'december',
 ]
 
+months_to_numbers = {
+    'january': 1,
+    'february': 2,
+    'march': 3,
+    'april': 4,
+    'may': 5,
+    'june': 6,
+    'july': 7,
+    'august': 8,
+    'september': 9,
+    'october': 10,
+    'november': 11,
+    'december': 12,
+}
+
 column_of_month_in_common_timesheets_file = 24
 column_of_year_in_common_timesheets_file = 30
