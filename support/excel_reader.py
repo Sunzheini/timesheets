@@ -220,7 +220,6 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
     # --------------------------------------------------------------------------------------------
     result = {}
 
-    to_exit = False
     total_cell_coordinate = None
     total_cell_row = None
     total_cell_column = None
@@ -228,11 +227,7 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
     days_cell_row = None
     days_cell_column = None
 
-    # ToDo: Debug from here
     for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=1):
-
-        if to_exit:
-            break
 
         for cell in row:
             cell_value = cell.value
@@ -265,23 +260,45 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
                     counter = 1
                     while 1:
                         current_total_column_cell = worksheet.cell(
-                            row=total_cell_row, column=total_cell_column + counter)
+                            row=total_cell_row, column=total_cell_column + 1 + counter)     # C18
 
                         # check empty -------------------------------------------------------------
                         if current_total_column_cell.value is None:
                             break
 
-                        # sum the values above it -------------------------------------------------
-                        current_sum = 0
-                        for row in worksheet.iter_rows(min_row=days_cell_row, max_row=total_cell_row - 1,
-                                                       min_col=total_cell_column + counter,
-                                                       max_col=total_cell_column + counter):
-                            for cell in row:
-                                if cell.value is None:
-                                    continue
+                        if counter == 32:
+                            sum_of_all_values = 0
+                            for key, value in result.items():
+                                sum_of_all_values += value
 
-                                current_sum += cell.value
+                            result['Ʃ'] = sum_of_all_values
+                            break
 
-                        result[current_total_column_cell.value] = current_sum
+                        # sum values from the same column from days_cell_row to total_cell_row-1 --
+                        start_cell = worksheet.cell(row=days_cell_row + 2, column=total_cell_column + 1 + counter)
+                        end_cell = worksheet.cell(row=total_cell_row - 1, column=total_cell_column + 1 + counter)
+                        all_cells = worksheet[start_cell.coordinate:end_cell.coordinate]
+
+                        sum_of_values = 0
+                        for current_cell in all_cells:
+                            the_cell = current_cell[0]
+                            if the_cell.value is None:
+                                continue
+
+                            sum_of_values += the_cell.value
+
+                        # result[current_total_column_cell.value] = sum_of_values
+                        result[counter] = sum_of_values
+
+                        counter += 1
+
+    # ToDo: Изкарва това и работи, да се добави само да се вземе последния ред и да се вземе сумата на всички стойности
+    #     използвай worksheet[start_cell.coordinate:end_cell.coordinate]
+    """
+    '{
+        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2, 14: 4, 15: 2, 16: 3, 17: 0, 
+        18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0, 26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0
+    }'
+    """
 
     return result

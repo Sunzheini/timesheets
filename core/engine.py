@@ -71,9 +71,13 @@ class Engine:
                 return return_result2, status_color, additional_message
 
         # Return the result ----------------------------------------------------------------
+        string_to_return = str(return_result['4BIZ']) + '\n' + str(return_result2)
+
+        # ToDo: from here
+
         status_color = light_color_success
         additional_message = None
-        return return_result2, status_color, additional_message
+        return string_to_return, status_color, additional_message
 
     def methods_bound_to_button_2(self, request_info):
         return_result = self.db_controller_object.get_employee_names()
