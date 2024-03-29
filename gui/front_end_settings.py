@@ -8,7 +8,7 @@ data_section_start_y = 60
 
 # general -----------------------------------------------------------------------------
 app_name = 'timesheets'
-app_version = 'v0.1a'
+app_version = 'v0.2a'
 window_width = 800
 window_height = 617 + data_section_height
 roboto_font_family = 'Roboto'

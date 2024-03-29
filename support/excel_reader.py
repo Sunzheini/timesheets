@@ -110,8 +110,14 @@ def get_the_info_related_to_the_employee(worksheet, coordinates):
                         row=reference_cell_row + counter, column=reference_cell_column)
 
                     # check if contents of reference cell include 'Total' -------------------------
-                    current_a_column_cell_contents = current_a_column_cell.value
-                    if 'Total' in current_a_column_cell_contents:
+                    current_project_name_column_cell_contents = current_a_column_cell.value
+
+                    # If there is an empty project name cell after `Reference` and before `Total`, skip it
+                    if current_project_name_column_cell_contents is None:
+                        counter += 1
+                        continue
+
+                    if 'Total' in current_project_name_column_cell_contents:
                         break_on_next_iter = True
 
                     result[current_a_column_cell.value] = {}  # current_a_column_cell.value == 'ScienceDiver'
@@ -122,6 +128,8 @@ def get_the_info_related_to_the_employee(worksheet, coordinates):
 
                         current_day_cell = worksheet.cell(
                             row=days_cell_row, column=days_cell_column + inner_counter)
+
+                        # check if current_day_cell is empty, and if so, break --------------------
                         if current_day_cell.value is None:
                             break
 
