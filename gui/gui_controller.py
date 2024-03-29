@@ -122,8 +122,8 @@ class MyGui:
         # -----------------------------------------------------------------------------
         # Create a line separator under the data section
         # -----------------------------------------------------------------------------
-        self.line_sep = Frame(self.window, height=2, bd=1, relief='sunken')
-        self.line_sep.place(x=10, y=data_section_height+140, width=780, height=2)
+        # self.line_sep = Frame(self.window, height=2, bd=1, relief='sunken')
+        # self.line_sep.place(x=10, y=data_section_height+140, width=780, height=2)
 
         # -----------------------------------------------------------------------------
         # Work Buttons
@@ -136,7 +136,7 @@ class MyGui:
         self.work_button_3.config(command=self.commands_bound_to_work_button_3)
 
         self.work_button_1.place(x=10+570, y=data_section_start_y+1)
-        self.work_button_2.place(x=295, y=data_section_height+155)
+        # self.work_button_2.place(x=295, y=data_section_height+155)    # ToDo: until it is used
         self.work_button_3.place(x=580, y=data_section_height+155)
 
         # -----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ class MyGui:
             apply_light_next_to_work_buttons(self.window))
 
         self.canvas1.place(x=195+570, y=data_section_start_y+1)
-        self.canvas2.place(x=480, y=data_section_height+155)
+        # self.canvas2.place(x=480, y=data_section_height+155)
         self.canvas3.place(x=765, y=data_section_height+155)
 
         # -----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ class MyGui:
         self.status_label = scrolledtext.ScrolledText(
             self.window,
             width=108,
-            height=11,
+            height=25,
             wrap=WORD,
             bg=status_label_background_color,
             fg=status_label_foreground_color,

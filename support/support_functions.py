@@ -27,3 +27,70 @@ def get_path_of_related_project_file(project_name, folder_path):
         if project_name.lower() in file.lower() and '.xlsx' in file:
             return os.path.join(folder_path, file)
     return 'Error: Could not find the project file for the given project'
+
+
+def prettify_nested_dict(type_string, dict_to_prettify):
+    if type_string == 'common':
+        return_string = '\n' + '--- Common Timesheets ---' + '\n'
+    elif type_string == 'project':
+        return_string = '\n' + '--- Timesheets по проекти ---' + '\n'
+
+    for key in dict_to_prettify.keys():
+        return_string += f'{key}:' + '\n'
+        for inner_key in dict_to_prettify[key].keys():
+            return_string += f'{inner_key}: {dict_to_prettify[key][inner_key]}, '
+        return_string += '\n'
+
+    return return_string
+
+
+def add_a_total_dict_to_nested_dict(dict_to_add_total_to):
+    total_dict_key = 'Total Ʃ Hours'
+    total_dict_value = {}
+
+    for key, value in dict_to_add_total_to.items():
+        for inner_key, inner_value in value.items():
+            if inner_key not in total_dict_value:
+                total_dict_value[inner_key] = inner_value
+            else:
+                total_dict_value[inner_key] += inner_value
+
+    dict_to_add_total_to[total_dict_key] = total_dict_value
+    return dict_to_add_total_to
+
+
+def evaluate_results(common_dict, project_dict):
+    return_string = '\n' + '--- Оценка на общите часове ---' + '\n'
+
+    common_dict_criteria = None
+    for key in common_dict.keys():
+        if 'Total' in key:
+            common_dict_criteria = common_dict[key]
+
+    project_dict_criteria = None
+    for key in project_dict.keys():
+        if 'Total' in key:
+            project_dict_criteria = project_dict[key]
+
+    if common_dict_criteria and project_dict_criteria:
+        if common_dict_criteria == project_dict_criteria:
+            return_string += 'Съвпадение'
+        else:
+            return_string += 'Наличие на разлики: '
+
+            for key in common_dict_criteria.keys():
+                if common_dict_criteria[key] != project_dict_criteria[key]:
+                    # return_string += f'{key}: {common_dict_criteria[key]} != {project_dict_criteria[key]}, '
+                    return_string += 'в Common: ' + f'{key}: {common_dict_criteria[key]}, '
+                    return_string += 'в Project: ' + f'{key}: {project_dict_criteria[key]}, '
+
+    return return_string
+
+
+def prettify_project_dict(dict_to_prettify):
+    return_string = '\n' + '--- Project ---' + '\n'
+
+    for key in dict_to_prettify.keys():
+        return_string += f'{key}: {dict_to_prettify[key]}, '
+
+    return return_string

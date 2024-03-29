@@ -1,7 +1,8 @@
 from db.database import months_to_numbers
 from gui.front_end_settings import light_color_success, light_color_error
 from support.excel_reader import read_from_excel_file, read_from_excel_file2
-from support.support_functions import get_path_of_related_common_timesheets_file, get_path_of_related_project_file
+from support.support_functions import get_path_of_related_common_timesheets_file, get_path_of_related_project_file, \
+    prettify_nested_dict, prettify_project_dict, add_a_total_dict_to_nested_dict, evaluate_results
 
 
 class Engine:
@@ -22,9 +23,14 @@ class Engine:
         month = request_info[2]
         folder_path = request_info[3]
         list_of_projects_for_the_month = []
+        return_result2 = {}
 
         # Get the path of the timesheets file ---------------------------------------------
-        timesheets_file_path = get_path_of_related_common_timesheets_file(year, folder_path)
+        try:
+            timesheets_file_path = get_path_of_related_common_timesheets_file(year, folder_path)
+        except Exception as e:
+            timesheets_file_path = 'Error: folder path is not valid'
+
         if 'Error' in timesheets_file_path:
             return_result = timesheets_file_path
             status_color = light_color_error
@@ -47,15 +53,24 @@ class Engine:
             if 'Total' not in project:
                 list_of_projects_for_the_month.append(project)
 
+        # ----------------------------------------------------------------------------------
+        # Phase 2
+        # ----------------------------------------------------------------------------------
+
         # for each project in the list of projects -----------------------------------------
         for current_project in list_of_projects_for_the_month:
 
-            # ToDo: temporary
-            if current_project != '4BIZ':
-                continue
+            # # ToDo: temporary
+            # if current_project != '4BIZ':
+            #     continue
 
             # Get the path to the project file ---------------------------------------------
             project_file_path = get_path_of_related_project_file(current_project, folder_path)
+            if 'Error' in project_file_path:
+                return_result2 = project_file_path
+                status_color = light_color_error
+                additional_message = None
+                return return_result2, status_color, additional_message
 
             # Read the data from the project file ------------------------------------------
             month_number = months_to_numbers[month]
@@ -63,7 +78,8 @@ class Engine:
             dict_to_compare = return_result[current_project]
 
             try:
-                return_result2 = read_from_excel_file2(project_file_path, sheet_name, dict_to_compare)
+                temp_project_dict_result = read_from_excel_file2(project_file_path, sheet_name, dict_to_compare)
+                return_result2[current_project] = temp_project_dict_result
             except Exception as e:
                 return_result2 = 'Error: ' + str(e)
                 status_color = light_color_error
@@ -71,9 +87,9 @@ class Engine:
                 return return_result2, status_color, additional_message
 
         # Return the result ----------------------------------------------------------------
-        string_to_return = str(return_result['4BIZ']) + '\n' + str(return_result2)
-
-        # ToDo: from here
+        string_to_return = (prettify_nested_dict('common', return_result)
+                            + prettify_nested_dict('project', add_a_total_dict_to_nested_dict(return_result2))
+                            + evaluate_results(return_result, return_result2))
 
         status_color = light_color_success
         additional_message = None

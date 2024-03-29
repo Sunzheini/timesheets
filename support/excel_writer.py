@@ -11,7 +11,7 @@ def write_to_excel_file(file_path, data_string):
     workbook = Workbook()
     worksheet = workbook.active
 
-    for row in data:
+    for row in data_string:
         worksheet.append(row)
 
     workbook.save(file_path)

@@ -2,7 +2,7 @@ from tkinter import Button, Label, Canvas
 
 
 # data section settings ----------------------------------------------------------------------
-data_section_height = 100
+data_section_height = 0
 data_section_start_y = 60
 
 
@@ -10,7 +10,7 @@ data_section_start_y = 60
 app_name = 'timesheets'
 app_version = 'v0.1a'
 window_width = 800
-window_height = 407 + data_section_height
+window_height = 617 + data_section_height
 roboto_font_family = 'Roboto'
 roboto_font_size = 9
 # window_background_color = '#E5E5E5'
