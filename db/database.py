@@ -1,3 +1,7 @@
+"""
+In the current implementation the database is hardcoded in the database.py file.
+"""
+
 employees = {
     1: {
         'name': 'Irina Kircheva',

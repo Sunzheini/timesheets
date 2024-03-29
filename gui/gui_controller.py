@@ -218,6 +218,12 @@ class MyGui:
     # -----------------------------------------------------------------------------
     @time_measurement_decorator
     def commands_bound_to_dropdown_menu(self, selected_option1, selected_option2, selected_option3):
+        """
+        This method is bound to the dropdown menu and executes the functions bound to it.
+        :param selected_option1: the selected employee name
+        :param selected_option2: the selected year
+        :param selected_option3: the selected month
+        """
         # execute functions and get the result, color and additional message if any
         request_info = selected_option1, selected_option2, selected_option3
         try:

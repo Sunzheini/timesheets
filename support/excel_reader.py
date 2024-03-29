@@ -3,6 +3,13 @@ from db.database import column_of_month_in_common_timesheets_file, column_of_yea
 
 
 def _determine_start_row_by_given_string(worksheet, month, year):
+    """
+    This function determines the start row by given month and year
+    :param worksheet: the worksheet
+    :param month: the month
+    :param year: the year
+    :return: the start row
+    """
     int_year = int(year)
     capitalized_month = month.capitalize()
     for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row,
@@ -13,12 +20,13 @@ def _determine_start_row_by_given_string(worksheet, month, year):
             if cell_value is None:
                 continue
 
-            if type(cell_value) == int:
+            if isinstance(cell_value, int):
                 continue
 
             cell_value = cell_value.strip()
             if cell_value != capitalized_month:
                 continue
+
             # check value of the cell in the same row but in column of year
             year_cell = worksheet[cell.row][column_of_year_in_common_timesheets_file].value
             if year_cell != int_year:
@@ -26,39 +34,44 @@ def _determine_start_row_by_given_string(worksheet, month, year):
             return cell.coordinate
 
 
-def get_the_info_related_to_the_employee(workbook, worksheet, coordinates):
+def get_the_info_related_to_the_employee(worksheet, coordinates):
     """
+    This function gets the information related to the employee
+    :param worksheet: the worksheet
+    :param coordinates: the coordinates
+    :return: the information related to the employee, which looks like this:
     '{'ScienceDiver': {
-    	1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
-    	16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0, 31: 0, 'Ʃ': '=SUM(C405:AG405)'},
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
+        16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0,
+        30: 0, 31: 0, 'Ʃ': '=SUM(C405:AG405)'},
       '4BIZ': {
-    	1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2, 14: 4, 15: 2,
-    	16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0, 26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': '=SUM(C406:AG406)'},
+        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2, 14: 4, 15: 2,
+        16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0, 26: 4, 27: 4, 28: 8, 29: 4,
+        30: 5, 31: 0, 'Ʃ': '=SUM(C406:AG406)'},
       'Bridge': {
-    	1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 1, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
-    	16: 1, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 1, 31: 0, 'Ʃ': '=SUM(C407:AG407)'},
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 1, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
+        16: 1, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0,
+        30: 1, 31: 0, 'Ʃ': '=SUM(C407:AG407)'},
       'InnoForward': {
-    	1: 6, 2: 4, 3: 0, 4: 0, 5: 6, 6: 2, 7: 6, 8: 4, 9: 4, 10: 0, 11: 0, 12: 4, 13: 6, 14: 4, 15: 6,
-    	16: 4, 17: 0, 18: 0, 19: 6, 20: 4, 21: 4, 22: 8, 23: 8, 24: 0, 25: 0, 26: 4, 27: 4, 28: 0, 29: 4, 30: 2, 31: 0, 'Ʃ': '=SUM(C408:AG408)'},
+        1: 6, 2: 4, 3: 0, 4: 0, 5: 6, 6: 2, 7: 6, 8: 4, 9: 4, 10: 0, 11: 0, 12: 4, 13: 6, 14: 4, 15: 6,
+        16: 4, 17: 0, 18: 0, 19: 6, 20: 4, 21: 4, 22: 8, 23: 8, 24: 0, 25: 0, 26: 4, 27: 4, 28: 0, 29: 4,
+        30: 2, 31: 0, 'Ʃ': '=SUM(C408:AG408)'},
       'Total Ʃ Hours ': {
-    	1: '=SUM(C405:C408)', 2: '=SUM(D405:D408)', 3: '=SUM(E405:E408)', 4: '=SUM(F405:F408)', 5: '=SUM(G405:G408)', 6: '=SUM(H405:H408)', 7: '=SUM(I405:I408)',
-    	8: '=SUM(J405:J408)', 9: '=SUM(K405:K408)', 10: '=SUM(L405:L408)', 11: '=SUM(M405:M408)', 12: '=SUM(N405:N408)', 13: '=SUM(O405:O408)', 14: '=SUM(P405:P408)',
-    	15: '=SUM(Q405:Q408)', 16: '=SUM(R405:R408)', 17: '=SUM(S405:S408)', 18: '=SUM(T405:T408)', 19: '=SUM(U405:U408)', 20: '=SUM(V405:V408)', 21: '=SUM(W405:W408)',
-    	22: '=SUM(X405:X408)', 23: '=SUM(Y405:Y408)', 24: '=SUM(Z405:Z408)', 25: '=SUM(AA405:AA408)', 26: '=SUM(AB405:AB408)', 27: '=SUM(AC405:AC408)', 28: '=SUM(AD405:AD408)',
-    	29: '=SUM(AE405:AE408)', 30: '=SUM(AF405:AF408)', 31: '=SUM(AG405:AG408)', 'Ʃ': '=SUM(AH405:AH408)'
+        1: '=SUM(C405:C408)', 2: '=SUM(D405:D408)', 3: '=SUM(E405:E408)', 4: '=SUM(F405:F408)', 5: '=SUM(G405:G408)',
+        6: '=SUM(H405:H408)', 7: '=SUM(I405:I408)', 8: '=SUM(J405:J408)', 9: '=SUM(K405:K408)', 10: '=SUM(L405:L408)',
+        11: '=SUM(M405:M408)', 12: '=SUM(N405:N408)', 13: '=SUM(O405:O408)', 14: '=SUM(P405:P408)',
+        15: '=SUM(Q405:Q408)', 16: '=SUM(R405:R408)', 17: '=SUM(S405:S408)', 18: '=SUM(T405:T408)',
+        19: '=SUM(U405:U408)', 20: '=SUM(V405:V408)', 21: '=SUM(W405:W408)', 22: '=SUM(X405:X408)',
+        23: '=SUM(Y405:Y408)', 24: '=SUM(Z405:Z408)', 25: '=SUM(AA405:AA408)', 26: '=SUM(AB405:AB408)',
+        27: '=SUM(AC405:AC408)', 28: '=SUM(AD405:AD408)', 29: '=SUM(AE405:AE408)', 30: '=SUM(AF405:AF408)',
+        31: '=SUM(AG405:AG408)', 'Ʃ': '=SUM(AH405:AH408)'
        }
     }'
     """
     result = {}
-
     to_exit = False
-    reference_cell_coordinate = None
-    reference_cell_row = None
-    reference_cell_column = None
-    days_cell_coordinate = None
-    days_cell_row = None
-    days_cell_column = None
 
+    # 1. Find the reference cell and the days cell ------------------------------------------------
     for row in worksheet.iter_rows(min_row=worksheet[coordinates].row + 1, max_row=worksheet.max_row,
                                    min_col=1, max_col=1):
 
@@ -86,7 +99,7 @@ def get_the_info_related_to_the_employee(workbook, worksheet, coordinates):
                 days_cell_row = reference_cell_row - 1  # 403
                 days_cell_column = reference_cell_column + 1  # 2
 
-                # Fill the result dictionary -----------------------------------------------------
+                # 1.1. Fill the result dictionary -----------------------------------------------------
                 break_on_next_iter = False
                 counter = 1
                 while 1:
@@ -132,28 +145,32 @@ def get_the_info_related_to_the_employee(workbook, worksheet, coordinates):
 
 def recalculate_because_of_formulas(time_dict):
     """
-'{'ScienceDiver': {
-    1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0,
-    26: 0, 27: 0, 28: 0, 29: 0, 30: 0, 31: 0, 'Ʃ': 0},
-  '4BIZ': {
-    1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2,
-    14: 4, 15: 2, 16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0,
-    26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': 73},
-  'Bridge': {
-    1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 1, 10: 0, 11: 0, 12: 0, 13: 0,
-    14: 0, 15: 0, 16: 1, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0,
-    26: 0, 27: 0, 28: 0, 29: 0, 30: 1, 31: 0, 'Ʃ': 3},
-  'InnoForward': {
-    1: 6, 2: 4, 3: 0, 4: 0, 5: 6, 6: 2, 7: 6, 8: 4, 9: 4, 10: 0, 11: 0, 12: 4, 13: 6, 14: 4,
-    15: 6, 16: 4, 17: 0, 18: 0, 19: 6, 20: 4, 21: 4, 22: 8, 23: 8, 24: 0, 25: 0, 26: 4, 27: 4,
-    28: 0, 29: 4, 30: 2, 31: 0, 'Ʃ': 100},
-  'Total Ʃ Hours ': {
-    1: 8, 2: 8, 3: 0, 4: 0, 5: 8, 6: 8, 7: 8, 8: 8, 9: 8, 10: 0, 11: 0, 12: 8, 13: 8,
-    14: 8, 15: 8, 16: 8, 17: 0, 18: 0, 19: 8, 20: 8, 21: 8, 22: 8, 23: 8, 24: 0, 25: 0,
-    26: 8, 27: 8, 28: 8, 29: 8, 30: 8, 31: 0, 'Ʃ': 176
-  }
-}'
+    Recalculate the time dictionary because of formulas
+    :param time_dict: the time dictionary
+    :return: the recalculated time dictionary, which looks like this:
+    '{
+      'ScienceDiver': {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+        14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0,
+        26: 0, 27: 0, 28: 0, 29: 0, 30: 0, 31: 0, 'Ʃ': 0},
+      '4BIZ': {
+        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2,
+        14: 4, 15: 2, 16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0,
+        26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': 73},
+      'Bridge': {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 1, 10: 0, 11: 0, 12: 0, 13: 0,
+        14: 0, 15: 0, 16: 1, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0,
+        26: 0, 27: 0, 28: 0, 29: 0, 30: 1, 31: 0, 'Ʃ': 3},
+      'InnoForward': {
+        1: 6, 2: 4, 3: 0, 4: 0, 5: 6, 6: 2, 7: 6, 8: 4, 9: 4, 10: 0, 11: 0, 12: 4, 13: 6, 14: 4,
+        15: 6, 16: 4, 17: 0, 18: 0, 19: 6, 20: 4, 21: 4, 22: 8, 23: 8, 24: 0, 25: 0, 26: 4, 27: 4,
+        28: 0, 29: 4, 30: 2, 31: 0, 'Ʃ': 100},
+      'Total Ʃ Hours ': {
+        1: 8, 2: 8, 3: 0, 4: 0, 5: 8, 6: 8, 7: 8, 8: 8, 9: 8, 10: 0, 11: 0, 12: 8, 13: 8,
+        14: 8, 15: 8, 16: 8, 17: 0, 18: 0, 19: 8, 20: 8, 21: 8, 22: 8, 23: 8, 24: 0, 25: 0,
+        26: 8, 27: 8, 28: 8, 29: 8, 30: 8, 31: 0, 'Ʃ': 176
+      }
+    }'
     """
     break_on_next_iter = False
 
@@ -189,27 +206,33 @@ def recalculate_because_of_formulas(time_dict):
     return time_dict
 
 
-def read_from_excel_file(file_path, name, year, month):
+def read_from_excel_file_of_type_common(file_path, name, year, month):
+    """
+    Read from the Excel file of type common timesheets
+    :param file_path: the file path of the Excel file
+    :param name: the name of the employee
+    :param year: the year, which as selected by the user
+    :param month: the month, which as selected by the user
+    :return: the information related to the employee for the given month and year in the Excel file
+    """
     workbook = load_workbook(file_path)
     worksheet = workbook[name]
     coordinates = _determine_start_row_by_given_string(worksheet, month, year)  # X481
-    # result = worksheet[coordinates].value                                            # September
-    result = get_the_info_related_to_the_employee(workbook, worksheet, coordinates)
+    result = get_the_info_related_to_the_employee(worksheet, coordinates)
     result = recalculate_because_of_formulas(result)
     return result
 
 
-def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
+def read_from_excel_file2(file_path, sheet_name):
     """
-    :param file_path:
-    :param sheet_name:
-    :param dict_to_compare:
+    :param file_path: the path to the file
+    :param sheet_name: the name of the sheet
+    :return: the result dictionary, which looks like this:
     {
         1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2,
         14: 4, 15: 2, 16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0,
         26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': 73
     }
-    :return:
     """
     if len(sheet_name) == 6:
         sheet_name = '0' + sheet_name
@@ -217,15 +240,8 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
     workbook = load_workbook(file_path)
     worksheet = workbook[sheet_name]
 
-    # --------------------------------------------------------------------------------------------
     result = {}
-
-    total_cell_coordinate = None
-    total_cell_row = None
-    total_cell_column = None
-    days_cell_coordinate = None
     days_cell_row = None
-    days_cell_column = None
 
     for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=1):
 
@@ -234,7 +250,7 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
             if cell_value is None:
                 continue
 
-            if type(cell_value) == int:
+            if isinstance(cell_value, int):
                 continue
 
             if 'Total' not in cell_value and 'Reference' not in cell_value:
@@ -287,18 +303,7 @@ def read_from_excel_file2(file_path, sheet_name, dict_to_compare):
 
                             sum_of_values += the_cell.value
 
-                        # result[current_total_column_cell.value] = sum_of_values
                         result[counter] = sum_of_values
-
                         counter += 1
-
-    # ToDo: Изкарва това и работи, да се добави само да се вземе последния ред и да се вземе сумата на всички стойности
-    #     използвай worksheet[start_cell.coordinate:end_cell.coordinate]
-    """
-    '{
-        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2, 14: 4, 15: 2, 16: 3, 17: 0, 
-        18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0, 26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0
-    }'
-    """
 
     return result

@@ -115,6 +115,12 @@ def apply_the_browse_buttons(window):
 
 
 def config_the_dropdown_menu(dropdown_menu, app_font):
+    """
+    Configures the dropdown menu
+    :param dropdown_menu: to configure
+    :param app_font: to use
+    :return: the configured dropdown menu
+    """
     dropdown_menu.config(
         width=20,
         font=app_font,
