@@ -83,6 +83,9 @@ class Engine:
                 additional_message = None
                 return return_result2, status_color, additional_message
 
+                # ToDo: 1. change ENN project name
+                # ToDo: instead of reading the data, 2. insert a new column and 3. color the cells
+
             # 5.2. Read the data from the project file ------------------------------------------
             month_number = months_to_numbers[month]
             sheet_name = f'{month_number}.{year}'
