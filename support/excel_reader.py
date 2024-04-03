@@ -315,3 +315,89 @@ def read_from_excel_file2(file_path, sheet_name):
                         counter += 1
 
     return result
+
+
+def read_from_excel_file_and_insert_rows(file_path, sheet_name):
+    """
+    :param file_path: the path to the file
+    :param sheet_name: the name of the sheet
+    :return: the result dictionary, which looks like this:
+    {
+        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2,
+        14: 4, 15: 2, 16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0,
+        26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': 73
+    }
+    """
+    if len(sheet_name) == 6:
+        sheet_name = '0' + sheet_name
+
+    workbook = load_workbook(file_path)
+    worksheet = workbook[sheet_name]
+
+    result = {}
+    days_cell_row = None
+
+    for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=1):
+
+        for cell in row:
+            cell_value = cell.value
+            if cell_value is None:
+                continue
+
+            if isinstance(cell_value, int):
+                continue
+
+            if 'Total' not in cell_value and 'Reference' not in cell_value:
+                continue
+
+            else:
+                if 'Reference' in cell_value:
+                    reference_cell_coordinate = cell.coordinate
+                    reference_cell_row = cell.row
+                    reference_cell_column = cell.column
+
+                    days_cell_coordinate = (
+                        worksheet.cell(row=reference_cell_row - 1, column=reference_cell_column + 1).coordinate)
+                    days_cell_row = reference_cell_row - 1
+                    days_cell_column = reference_cell_column + 1
+
+                else:
+                    total_cell_coordinate = cell.coordinate  # A404
+                    total_cell_row = cell.row  # 404
+                    total_cell_column = cell.column  # 1
+
+                    # Fill the result dictionary ---------------------------------------------------
+                    counter = 1
+                    while 1:
+                        current_total_column_cell = worksheet.cell(
+                            row=total_cell_row, column=total_cell_column + 1 + counter)     # C18
+
+                        # check empty -------------------------------------------------------------
+                        if current_total_column_cell.value is None:
+                            break
+
+                        if counter == 32:
+                            sum_of_all_values = 0
+                            for key, value in result.items():
+                                sum_of_all_values += value
+
+                            result['Ʃ'] = sum_of_all_values
+                            break
+
+                        # sum values from the same column from days_cell_row to total_cell_row-1 --
+                        start_cell = worksheet.cell(row=days_cell_row + 2, column=total_cell_column + 1 + counter)
+                        end_cell = worksheet.cell(row=total_cell_row - 1, column=total_cell_column + 1 + counter)
+                        all_cells = worksheet[start_cell.coordinate:end_cell.coordinate]
+
+                        sum_of_values = 0
+                        for current_cell in all_cells:
+                            the_cell = current_cell[0]
+                            if the_cell.value is None:
+                                continue
+
+                            sum_of_values += the_cell.value
+
+                        result[counter] = sum_of_values
+                        counter += 1
+
+    return result

@@ -1,6 +1,7 @@
 from db.database import months_to_numbers
 from gui.front_end_settings import light_color_success, light_color_error
-from support.excel_reader import read_from_excel_file_of_type_common, read_from_excel_file2
+from support.excel_reader import read_from_excel_file_of_type_common, read_from_excel_file2, \
+    read_from_excel_file_and_insert_rows
 from support.support_functions import get_path_of_related_common_timesheets_file, get_path_of_related_project_file, \
     prettify_nested_dict, add_a_total_dict_to_nested_dict, evaluate_results
 
@@ -68,6 +69,11 @@ class Engine:
             if 'Total' not in project:
                 list_of_projects_for_the_month.append(project)
 
+        # 4.1. Correct InnoForward with ENN --------------------------------------------------
+        if 'InnoForward' in list_of_projects_for_the_month:
+            list_of_projects_for_the_month.remove('InnoForward')
+            list_of_projects_for_the_month.append('EEN')
+
         # ----------------------------------------------------------------------------------
         # Phase 2
         # ----------------------------------------------------------------------------------
@@ -83,15 +89,18 @@ class Engine:
                 additional_message = None
                 return return_result2, status_color, additional_message
 
-                # ToDo: 1. change ENN project name
-                # ToDo: instead of reading the data, 2. insert a new column and 3. color the cells
+                # ToDo: 1. change ENN project name: Done
+                # ToDo: 2. instead of reading the data, insert a new column
+                # ToDo: 3. color the cells
 
-            # 5.2. Read the data from the project file ------------------------------------------
+            # Option I: 5.2. Read the data from the project file: not used ---------------------
+            # Option II: 5.2. Insert rows in the project file: active ---------------------------
             month_number = months_to_numbers[month]
             sheet_name = f'{month_number}.{year}'
 
             try:
-                temp_project_dict_result = read_from_excel_file2(project_file_path, sheet_name)
+                # temp_project_dict_result = read_from_excel_file2(project_file_path, sheet_name)       # I
+                temp_project_dict_result = read_from_excel_file_and_insert_rows(project_file_path, sheet_name)      # II
                 return_result2[current_project] = temp_project_dict_result
             except Exception as e:
                 return_result2 = 'Error: ' + str(e)
@@ -100,11 +109,15 @@ class Engine:
                 return return_result2, status_color, additional_message
 
         # 6. Return the result ----------------------------------------------------------------
-        string_to_return = (
-            prettify_nested_dict('common', return_result)
-            + prettify_nested_dict('project', add_a_total_dict_to_nested_dict(return_result2))
-            + evaluate_results(return_result, return_result2)
-        )
+        # I
+        # string_to_return = (
+        #     prettify_nested_dict('common', return_result)
+        #     + prettify_nested_dict('project', add_a_total_dict_to_nested_dict(return_result2))
+        #     + evaluate_results(return_result, return_result2)
+        # )
+
+        # II
+        string_to_return = (prettify_nested_dict('common', return_result))
 
         status_color = light_color_success
         additional_message = None

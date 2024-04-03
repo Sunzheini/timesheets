@@ -41,9 +41,9 @@ def get_path_of_related_project_file(project_name, folder_path):
 
     # check file name for project name
     for file in files_in_the_folder:
-        if project_name.lower() in file.lower() and '.xlsx' in file:
+        if project_name.lower().strip() in file.lower() and '.xlsx' in file:
             return os.path.join(folder_path, file)
-    return 'Error: Could not find the project file for the given project'
+    return f'Error: Could not find the project file for the given project in Common: {project_name}'
 
 
 def prettify_nested_dict(type_string, dict_to_prettify):
