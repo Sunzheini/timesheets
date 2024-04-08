@@ -1,5 +1,8 @@
 from openpyxl import load_workbook
+from openpyxl.styles import PatternFill
+
 from db.database import column_of_month_in_common_timesheets_file, column_of_year_in_common_timesheets_file, months
+from support.support_functions import get_holidays_for_a_specific_month_and_year
 
 
 def _determine_start_row_by_given_string(worksheet, month, year):
@@ -317,27 +320,47 @@ def read_from_excel_file2(file_path, sheet_name):
     return result
 
 
-def read_from_excel_file_and_insert_rows(file_path, sheet_name):
+def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, data, dict_with_holidays):
     """
+    :param dict_with_holidays: looks like this:
+    {'1': 'work day', '2': 'work day', '3': 'work day', '4': 'work day', '5': 'weekend',}
+    :param data: the data for the given project to insert, looks like this:
+    {
+        1: 6, 2: 4, 3: 0, 4: 0, 5: 6, 6: 2, 7: 6, 8: 4, 9: 4, 10: 0, 11: 0, 12: 4, 13: 6, 14: 4,
+        15: 6, 16: 4, 17: 0, 18: 0, 19: 6, 20: 4, 21: 4, 22: 8, 23: 8, 24: 0, 25: 0, 26: 4, 27: 4,
+        28: 0, 29: 4, 30: 2, 31: 0, 'Ʃ': 100
+    }
+    :param month: the month
+    :param year: the year
     :param file_path: the path to the file
     :param sheet_name: the name of the sheet
-    :return: the result dictionary, which looks like this:
-    {
-        1: 2, 2: 4, 3: 0, 4: 0, 5: 2, 6: 6, 7: 2, 8: 4, 9: 3, 10: 0, 11: 0, 12: 4, 13: 2,
-        14: 4, 15: 2, 16: 3, 17: 0, 18: 0, 19: 2, 20: 4, 21: 4, 22: 0, 23: 0, 24: 0, 25: 0,
-        26: 4, 27: 4, 28: 8, 29: 4, 30: 5, 31: 0, 'Ʃ': 73
-    }
+    :return: a string indicating if the operation was successful or not
     """
+    result = ''
+
     if len(sheet_name) == 6:
         sheet_name = '0' + sheet_name
 
     workbook = load_workbook(file_path)
-    worksheet = workbook[sheet_name]
 
-    result = {}
+    # 1. check if a worksheet exists with the same name --------------------------------------------
+    if sheet_name in workbook.sheetnames:
+        result = f'The sheet "{sheet_name}" already exists in the file "{file_path}"'
+        return result
+
+    # 2. Copy from a template sheet and rename it --------------------------------------------------
+    template_sheet = workbook['template']
+    new_sheet = workbook.copy_worksheet(template_sheet)
+    new_sheet.title = sheet_name
+
+    # 3. Update the year and month in the new sheet ------------------------------------------------
+    new_sheet['X1'] = month.capitalize()
+    new_sheet['AE1'] = year
+
+    # 4. Find the reference cell and the days cell -------------------------------------------------
     days_cell_row = None
 
-    for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=1):
+    for row in new_sheet.iter_rows(min_row=1, max_row=new_sheet.max_row, min_col=1, max_col=1):
 
         for cell in row:
             cell_value = cell.value
@@ -357,47 +380,36 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name):
                     reference_cell_column = cell.column
 
                     days_cell_coordinate = (
-                        worksheet.cell(row=reference_cell_row - 1, column=reference_cell_column + 1).coordinate)
+                        new_sheet.cell(row=reference_cell_row - 1, column=reference_cell_column + 1).coordinate)
                     days_cell_row = reference_cell_row - 1
                     days_cell_column = reference_cell_column + 1
 
-                else:
+                else:   # 'Total' in cell_value
                     total_cell_coordinate = cell.coordinate  # A404
                     total_cell_row = cell.row  # 404
                     total_cell_column = cell.column  # 1
 
-                    # Fill the result dictionary ---------------------------------------------------
-                    counter = 1
-                    while 1:
-                        current_total_column_cell = worksheet.cell(
-                            row=total_cell_row, column=total_cell_column + 1 + counter)     # C18
-
-                        # check empty -------------------------------------------------------------
-                        if current_total_column_cell.value is None:
+    # copy the data from the data dictionary to the row before the total row -------------------------
+                    for key, value in data.items():
+                        if key == 'Ʃ':
                             break
 
-                        if counter == 32:
-                            sum_of_all_values = 0
-                            for key, value in result.items():
-                                sum_of_all_values += value
+                        new_sheet.cell(row=total_cell_row + 2, column=key+2, value=value)
 
-                            result['Ʃ'] = sum_of_all_values
-                            break
+                    # color the weekend cells ---------------------------------------------------------------------
+                    for key, value in dict_with_holidays.items():
+                        if value == 'weekend':
+                            for current_row in new_sheet.iter_rows(min_row=days_cell_row + 2,
+                                                                   max_row=total_cell_row - 1,
+                                                                   min_col=int(key) + 2, max_col=int(key) + 2):
+                                for current_cell in current_row:
+                                    current_cell.fill = PatternFill(start_color='D9D9D9',
+                                                                    end_color='D9D9D9',
+                                                                    fill_type='solid')
 
-                        # sum values from the same column from days_cell_row to total_cell_row-1 --
-                        start_cell = worksheet.cell(row=days_cell_row + 2, column=total_cell_column + 1 + counter)
-                        end_cell = worksheet.cell(row=total_cell_row - 1, column=total_cell_column + 1 + counter)
-                        all_cells = worksheet[start_cell.coordinate:end_cell.coordinate]
+    result = f'The sheet "{sheet_name}" was successfully created in the file "{file_path}"'
 
-                        sum_of_values = 0
-                        for current_cell in all_cells:
-                            the_cell = current_cell[0]
-                            if the_cell.value is None:
-                                continue
-
-                            sum_of_values += the_cell.value
-
-                        result[counter] = sum_of_values
-                        counter += 1
+    # Save the workbook after copying and renaming the sheet
+    workbook.save(file_path)
 
     return result

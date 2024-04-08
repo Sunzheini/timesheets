@@ -1,3 +1,4 @@
+import calendar
 import os
 
 
@@ -119,3 +120,33 @@ def evaluate_results(common_dict, project_dict):
                     return_string += 'в Project: ' + f'{key}: {project_dict_criteria[key]}, '
 
     return return_string
+
+
+def get_holidays_for_a_specific_month_and_year(year, month):
+    """
+    :param year: the year, int
+    :param month: the month, int
+    :return: a dictionary, which looks like:
+    {
+        '1': 'work day',
+        '2': 'work day',
+        '3': 'work day',
+        '4': 'work day',
+        '5': 'weekend',
+        '6': 'weekend',
+        '7': 'work day', etc.
+    }
+    """
+    days_in_month = calendar.monthrange(year, month)[1]
+    weekday_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    holidays = {}
+
+    for day in range(1, days_in_month + 1):
+        weekday_index = calendar.weekday(year, month, day)
+        day_name = weekday_names[weekday_index]
+        if day_name == 'Saturday' or day_name == 'Sunday':
+            holidays[str(day)] = 'weekend'
+        else:
+            holidays[str(day)] = 'work day'
+
+    return holidays

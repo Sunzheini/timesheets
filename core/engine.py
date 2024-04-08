@@ -1,9 +1,9 @@
-from db.database import months_to_numbers
+from db.database import months_to_numbers, months
 from gui.front_end_settings import light_color_success, light_color_error
 from support.excel_reader import read_from_excel_file_of_type_common, read_from_excel_file2, \
     read_from_excel_file_and_insert_rows
 from support.support_functions import get_path_of_related_common_timesheets_file, get_path_of_related_project_file, \
-    prettify_nested_dict, add_a_total_dict_to_nested_dict, evaluate_results
+    prettify_nested_dict, add_a_total_dict_to_nested_dict, evaluate_results, get_holidays_for_a_specific_month_and_year
 
 
 class Engine:
@@ -39,7 +39,8 @@ class Engine:
         month = request_info[2]
         folder_path = request_info[3]
         list_of_projects_for_the_month = []
-        return_result2 = {}
+        # return_result2 = {}                   # I
+        return_result2 = ''                     # II
 
         # 2. Get the path of the timesheets file ---------------------------------------------
         try:
@@ -69,10 +70,12 @@ class Engine:
             if 'Total' not in project:
                 list_of_projects_for_the_month.append(project)
 
-        # 4.1. Correct InnoForward with ENN --------------------------------------------------
-        if 'InnoForward' in list_of_projects_for_the_month:
-            list_of_projects_for_the_month.remove('InnoForward')
-            list_of_projects_for_the_month.append('EEN')
+        # 4.1. Get the holidays
+        dict_with_holidays = get_holidays_for_a_specific_month_and_year(int(year), months.index(month) + 1)
+        """
+        look like:
+        {'1': 'work day', '2': 'work day', '3': 'work day', '4': 'work day', '5': 'weekend',}
+        """
 
         # ----------------------------------------------------------------------------------
         # Phase 2
@@ -81,27 +84,40 @@ class Engine:
         # 5. for each project in the list of projects -----------------------------------------
         for current_project in list_of_projects_for_the_month:
 
-            # 5.1. Get the path to the project file ---------------------------------------------
-            project_file_path = get_path_of_related_project_file(current_project, folder_path)
+            # ToDo: temp to try with 1
+            # if current_project != '4BIZ':
+            #     continue
+
+            # 5.1. Temp variable if the project is EEN -----------------------------------------
+            if current_project == 'InnoForward':
+                temp_name_of_project = 'EEN'
+            else:
+                temp_name_of_project = current_project
+
+            # 5.2. Get the path to the project file ---------------------------------------------
+            project_file_path = get_path_of_related_project_file(temp_name_of_project, folder_path)
             if 'Error' in project_file_path:
                 return_result2 = project_file_path
                 status_color = light_color_error
                 additional_message = None
                 return return_result2, status_color, additional_message
 
-                # ToDo: 1. change ENN project name: Done
-                # ToDo: 2. instead of reading the data, insert a new column
-                # ToDo: 3. color the cells
-
-            # Option I: 5.2. Read the data from the project file: not used ---------------------
-            # Option II: 5.2. Insert rows in the project file: active ---------------------------
+            # Option I: 5.3. Read the data from the project file: not used ---------------------
+            # Option II: 5.3. Insert rows in the project file: active ---------------------------
             month_number = months_to_numbers[month]
             sheet_name = f'{month_number}.{year}'
 
             try:
-                # temp_project_dict_result = read_from_excel_file2(project_file_path, sheet_name)       # I
-                temp_project_dict_result = read_from_excel_file_and_insert_rows(project_file_path, sheet_name)      # II
-                return_result2[current_project] = temp_project_dict_result
+                # temp_project_dict_result = read_from_excel_file2(project_file_path, sheet_name)   # I
+                # return_result2[current_project] = temp_project_dict_result                        # I
+
+                temp_project_dict_result = read_from_excel_file_and_insert_rows(
+                    project_file_path,
+                    sheet_name, year, month, return_result[current_project], dict_with_holidays
+                )      # II
+                return_result2 += temp_project_dict_result                                          # II
+                return_result2 += '\n'                                                              # II
+
             except Exception as e:
                 return_result2 = 'Error: ' + str(e)
                 status_color = light_color_error
@@ -118,6 +134,9 @@ class Engine:
 
         # II
         string_to_return = (prettify_nested_dict('common', return_result))
+        string_to_return += '\n'
+        string_to_return += '--- Projects ---\n'
+        string_to_return += return_result2
 
         status_color = light_color_success
         additional_message = None
