@@ -19,8 +19,10 @@ default_status_text = 'Статус: готов'
 
 
 # button names -------------------------------------------------------------------------
-name_of_browse_label1 = 'Път към проекта: няма'
-name_of_browse_button1 = 'Избери пътя към проекта'
+# name_of_browse_label1 = 'Път към проекта: няма'
+name_of_browse_label1 = 'не е избрано'
+# name_of_browse_button1 = 'Избери пътя към проекта'
+name_of_browse_button1 = 'Избери папката на проекта'
 name_of_button1 = 'Зареди <A>'
 name_of_button2 = 'Сравни <S>'
 name_of_button3 = 'Изчисти <D>'

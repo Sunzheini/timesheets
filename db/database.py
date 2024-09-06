@@ -77,3 +77,5 @@ months_to_numbers = {
 
 column_of_month_in_common_timesheets_file = 24
 column_of_year_in_common_timesheets_file = 30
+
+default_folder_path: str = r'C:\Users\User\Desktop\Marine Cluster BG\Files'

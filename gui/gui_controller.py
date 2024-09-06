@@ -5,6 +5,7 @@ from tkinter import *
 from tkinter import font
 from tkinter import scrolledtext
 
+from db.database import default_folder_path
 from support.decorators import time_measurement_decorator
 from gui.front_end_settings import (roboto_font_family, roboto_font_size,
                                     apply_the_front_end_settings, apply_the_browse_buttons,
@@ -25,10 +26,7 @@ class MyGui:
     FONT_FAMILY = roboto_font_family
     FONT_SIZE = roboto_font_size
 
-    def __init__(
-            self,
-            engine_object,                                  # responsible for the logic of the application
-    ):
+    def __init__(self, engine_object):
         """
         This is the constructor of the class.
         Creates the window and all the elements inside it, see below.
@@ -250,12 +248,13 @@ class MyGui:
         :return: None
         """
         # execute functions and get the result, color and additional message if any
-        request_info = (
+        request_info = [
             self.selected_option1.get(),
             self.selected_option2.get(),
             self.selected_option3.get(),
             self.selected_path,
-        )
+        ]
+
         try:
             return_result, status_color, additional_message = self.engine_object.methods_bound_to_button_1(request_info)
         except Exception as e:
