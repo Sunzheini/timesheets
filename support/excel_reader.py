@@ -345,7 +345,8 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, dat
 
     # 1. check if a worksheet exists with the same name --------------------------------------------
     if sheet_name in workbook.sheetnames:
-        result = f'The sheet "{sheet_name}" already exists in the file "{file_path}"'
+        # result = f'The sheet "{sheet_name}" already exists in the file "{file_path}"'
+        result = f'Страницата "{sheet_name}" вече съществува в "{file_path}"'
         return result
 
     # 2. Copy from a template sheet and rename it --------------------------------------------------
@@ -407,7 +408,8 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, dat
                                                                     end_color='D9D9D9',
                                                                     fill_type='solid')
 
-    result = f'The sheet "{sheet_name}" was successfully created in the file "{file_path}"'
+    # result = f'The sheet "{sheet_name}" was successfully created in the file "{file_path}"'
+    result = f'Страница "{sheet_name}" бе успешно създадена във файл "{file_path}"'
 
     # Save the workbook after copying and renaming the sheet
     workbook.save(file_path)
