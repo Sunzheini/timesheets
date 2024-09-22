@@ -1,3 +1,5 @@
+import shutil
+import os
 from gui.front_end_settings import light_color_success, light_color_error
 from support.excel_reader import read_from_excel_file_of_type_common, read_from_excel_file2, \
     read_from_excel_file_and_insert_rows
@@ -109,13 +111,37 @@ class Engine:
             else:
                 temp_name_of_project = current_project
 
-            # 5.2. Get the path to the project file ---------------------------------------------
+            # # 5.2. Get the path to the project file ---------------------------------------------
+            # project_file_path = get_path_of_related_project_file(temp_name_of_project, folder_path)
+            # if 'Error' in project_file_path:
+            #     return_result2 = project_file_path
+            #     status_color = light_color_error
+            #     additional_message = None
+            #     return return_result2, status_color, additional_message
+
+            # 5.2. After adding the creation of new projects: Get the path to the project file ------------------
             project_file_path = get_path_of_related_project_file(temp_name_of_project, folder_path)
             if 'Error' in project_file_path:
-                return_result2 = project_file_path
-                status_color = light_color_error
-                additional_message = None
-                return return_result2, status_color, additional_message
+
+                # try to create the project file by copying `Timesheet MCB - Template.xlsx` and renaming it
+                try:
+                    # 1. Get the path of the template file
+                    template_file_path = os.path.join(folder_path, 'Timesheet MCB - Template.xlsx')
+
+                    # 2. Get the path of the new project file, e.g. `Timesheet MCB - EEN_Irina_Kircheva.xlsx`
+                    new_project_file_path = os.path.join(folder_path, f'Timesheet MCB - {temp_name_of_project}_{name}.xlsx')
+
+                    # 3. Copy the template file to the new project file
+                    shutil.copy(template_file_path, new_project_file_path)
+
+                    # 4. Update the project file path
+                    project_file_path = new_project_file_path
+
+                except Exception as e:
+                    return_result2 = 'Error: ' + str(e)
+                    status_color = light_color_error
+                    additional_message = None
+                    return return_result2, status_color, additional_message
 
             # Option I: 5.3. Read the data from the project file: not used ---------------------
             # Option II: 5.3. Insert rows in the project file: active ---------------------------

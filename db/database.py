@@ -8,6 +8,7 @@ class DataBase:
         self.employees = {
             '----': 0,
         }
+        self.actual_projects = []
         self.years = [
             2020,
             2021,

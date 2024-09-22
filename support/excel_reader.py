@@ -422,20 +422,20 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, dat
     return result
 
 
-def get_employee_names_and_hourly_rate_from_the_excel_database(file_path):
+def get_employee_names_hourly_rates_projects_from_excel_database(file_path):
     """
     :param file_path: the path to the Excel file
     :return: the list of employee names
     """
     workbook = load_workbook(file_path)
 
+    # -------------------------------------------------------------------------------------
     # get the first sheet
     sheet = workbook[workbook.sheetnames[0]]
 
     employee_names_and_hourly_rate = {}
 
     # get the names from the second column and set as key, then get the hourly rate from the eight column and set as value, skip if the name is empty
-
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=2, max_col=8):
         employee_name = row[0].value
         hourly_rate = row[6].value
@@ -445,6 +445,20 @@ def get_employee_names_and_hourly_rate_from_the_excel_database(file_path):
 
         employee_names_and_hourly_rate[employee_name] = hourly_rate
 
-    return employee_names_and_hourly_rate
+    # -------------------------------------------------------------------------------------
+    # get the second sheet
+    sheet = workbook[workbook.sheetnames[1]]
 
+    actual_projects = []
 
+    # get the names starting from the second row and add to list, skip if the name is empty
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=1, max_col=1):
+        project_name = row[0].value
+
+        if project_name is None:
+            continue
+
+        actual_projects.append(project_name)
+
+    # -------------------------------------------------------------------------------------
+    return employee_names_and_hourly_rate, actual_projects

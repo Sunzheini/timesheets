@@ -1,4 +1,4 @@
-from support.excel_reader import get_employee_names_and_hourly_rate_from_the_excel_database
+from support.excel_reader import get_employee_names_hourly_rates_projects_from_excel_database
 
 
 class DatabaseController:
@@ -10,8 +10,9 @@ class DatabaseController:
         self.database = database
 
     def update_database(self, path_to_file):
-        employee_data = get_employee_names_and_hourly_rate_from_the_excel_database(path_to_file)
+        employee_data, actual_projects = get_employee_names_hourly_rates_projects_from_excel_database(path_to_file)
         self.database.employees = employee_data
+        self.database.actual_projects = actual_projects
 
 
     def get_employee_names(self):
