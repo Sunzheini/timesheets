@@ -41,6 +41,7 @@ class Engine:
         list_of_projects_for_the_month = []
         # return_result2 = {}                   # I
         return_result2 = ''                     # II
+        vedomosti = {}
 
         # 2. Get the path of the timesheets file ---------------------------------------------
         try:
@@ -166,7 +167,27 @@ class Engine:
                 additional_message = None
                 return return_result2, status_color, additional_message
 
-        # 6. Return the result ----------------------------------------------------------------
+        # ----------------------------------------------------------------------------------
+        # Phase 3
+        # ----------------------------------------------------------------------------------
+
+        # ToDo: here
+        # 6. Create the `vedomosti` object for all projects for this employee -----------------
+        for project in return_result:
+            if 'Total' in project:
+                continue
+
+            else:
+                vedomosti[project] = return_result[project]['Ʃ']
+
+        print(vedomosti)    # {'4BIZ ': 80, 'BRIDGE-BS': 8, 'InnoForward': 80}
+        
+
+
+
+
+
+        # 7. Return the result ----------------------------------------------------------------
         # I
         # string_to_return = (
         #     prettify_nested_dict('common', return_result)
