@@ -38,7 +38,7 @@ class MyGui:
         # -----------------------------------------------------------------------------
         self.window = Tk()
         self.window = apply_the_front_end_settings(self.window)
-        app_font = font.Font(family=self.FONT_FAMILY, size=self.FONT_SIZE)
+        self.app_font = font.Font(family=self.FONT_FAMILY, size=self.FONT_SIZE)
 
         # -----------------------------------------------------------------------------
         # External objects
@@ -83,19 +83,14 @@ class MyGui:
         # -----------------------------------------------------------------------------
         # Data section
         # -----------------------------------------------------------------------------
-        self.employee_names_options = self.engine_object.db_controller_object.get_employee_names()
-        self.selected_option1 = StringVar()                         # Define a Tkinter var to store the selected option
-        self.selected_option1.set(self.employee_names_options[0])   # Set the default value to the first option
-        self.dropdown_menu1 = OptionMenu(self.window, self.selected_option1, *self.employee_names_options)
-        self.dropdown_menu1 = config_the_dropdown_menu(self.dropdown_menu1, app_font)
-        self.dropdown_menu1.place(x=10, y=data_section_start_y)
+        self.update_data_section()
 
         self.years_options = self.engine_object.db_controller_object.get_years()
         self.selected_option2 = StringVar()
         current_year = time.localtime().tm_year
         self.selected_option2.set(str(current_year))
         self.dropdown_menu2 = OptionMenu(self.window, self.selected_option2, *self.years_options)
-        self.dropdown_menu2 = config_the_dropdown_menu(self.dropdown_menu2, app_font)
+        self.dropdown_menu2 = config_the_dropdown_menu(self.dropdown_menu2, self.app_font)
         self.dropdown_menu2.place(x=200, y=data_section_start_y)
 
         self.months_options = self.engine_object.db_controller_object.get_months()
@@ -103,7 +98,7 @@ class MyGui:
         current_month = time.localtime().tm_mon
         self.selected_option3.set(self.months_options[current_month-2])
         self.dropdown_menu3 = OptionMenu(self.window, self.selected_option3, *self.months_options)
-        self.dropdown_menu3 = config_the_dropdown_menu(self.dropdown_menu3, app_font)
+        self.dropdown_menu3 = config_the_dropdown_menu(self.dropdown_menu3, self.app_font)
         self.dropdown_menu3.place(x=390, y=data_section_start_y)
 
         def execute_on_dropdown_select(*args):
@@ -174,10 +169,24 @@ class MyGui:
             padx=5,
             pady=5,
             relief='solid',
-            font=app_font,
+            font=self.app_font,
         )
         self.status_label.place(x=10, y=data_section_height+222)
         self.status_label.insert(END, self.contents_of_status_label)
+
+    def update_data_section(self):
+        """
+        Thi function updates the data section.
+            """
+        self.employee_names_options = self.engine_object.db_controller_object.get_employee_names()
+        self.selected_option1 = StringVar()  # Define a Tkinter var to store the selected option
+        self.selected_option1.set(self.employee_names_options[0])  # Set the default value to the first option
+        self.dropdown_menu1 = OptionMenu(self.window, self.selected_option1, *self.employee_names_options)
+        self.dropdown_menu1 = config_the_dropdown_menu(self.dropdown_menu1, self.app_font)
+        self.dropdown_menu1.place(x=10, y=data_section_start_y)
+
+        # update window
+        self.window.update()
 
     # -----------------------------------------------------------------------------
     # Methods on browse buttons
@@ -199,6 +208,11 @@ class MyGui:
         self.selected_path = filepath
         self.update_label_next_to_browse_button(self.browse_label_1, f"{self.selected_path}")
         self.update_status_label(f"Избрано: '{self.selected_path}'")
+
+        # join path with the file name which is database.xlsx
+        path_to_file = os.path.join(self.selected_path, 'database.xlsx')
+        self.engine_object.db_controller_object.update_database(path_to_file)
+        self.update_data_section()
 
     @staticmethod
     def update_label_next_to_browse_button(label_number, text):

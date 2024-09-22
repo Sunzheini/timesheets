@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
 
-from db.database import column_of_month_in_common_timesheets_file, column_of_year_in_common_timesheets_file, months
+from db.database import column_of_month_in_common_timesheets_file, column_of_year_in_common_timesheets_file
 from support.support_functions import get_holidays_for_a_specific_month_and_year
 
 
@@ -350,7 +350,12 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, dat
         return result
 
     # 2. Copy from a template sheet and rename it --------------------------------------------------
-    template_sheet = workbook['template']
+    try:
+        template_sheet = workbook['template']
+    except KeyError:
+        result = f'The template sheet does not exist in the file "{file_path}"'
+        return result
+
     new_sheet = workbook.copy_worksheet(template_sheet)
     new_sheet.title = sheet_name
 
@@ -415,3 +420,31 @@ def read_from_excel_file_and_insert_rows(file_path, sheet_name, year, month, dat
     workbook.save(file_path)
 
     return result
+
+
+def get_employee_names_and_hourly_rate_from_the_excel_database(file_path):
+    """
+    :param file_path: the path to the Excel file
+    :return: the list of employee names
+    """
+    workbook = load_workbook(file_path)
+
+    # get the first sheet
+    sheet = workbook[workbook.sheetnames[0]]
+
+    employee_names_and_hourly_rate = {}
+
+    # get the names from the second column and set as key, then get the hourly rate from the eight column and set as value, skip if the name is empty
+
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=2, max_col=8):
+        employee_name = row[0].value
+        hourly_rate = row[6].value
+
+        if employee_name is None:
+            continue
+
+        employee_names_and_hourly_rate[employee_name] = hourly_rate
+
+    return employee_names_and_hourly_rate
+
+

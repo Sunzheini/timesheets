@@ -1,4 +1,3 @@
-from db.database import months_to_numbers, months
 from gui.front_end_settings import light_color_success, light_color_error
 from support.excel_reader import read_from_excel_file_of_type_common, read_from_excel_file2, \
     read_from_excel_file_and_insert_rows
@@ -25,8 +24,7 @@ class Engine:
         additional_message = None
         return return_result, status_color, additional_message
 
-    @staticmethod
-    def methods_bound_to_button_1(request_info):
+    def methods_bound_to_button_1(self, request_info):
         """
         This method is bound to the first button and is used to display the information
         gathered from the Common Timesheets and the project files for the selected month
@@ -60,7 +58,7 @@ class Engine:
                 timesheets_file_path, name, year, month,
             )
         except Exception as e:
-            return_result = 'Error: ' + str(e)
+            return_result = 'Error: ' + str(e) + ' in Common Timesheets' + ' for the selected month'
             status_color = light_color_error
             additional_message = None
             return return_result, status_color, additional_message
@@ -88,6 +86,7 @@ class Engine:
         """
 
         # 4.1. Get the holidays for the specific month and year ---------------------------------
+        months = self.db_controller_object.get_months()
         dict_with_holidays = get_holidays_for_a_specific_month_and_year(int(year), months.index(month) + 1)
         """
         dict_with_holidays = {'1': 'work day', '2': 'work day', '3': 'work day', '4': 'work day', '5': 'weekend',  }
@@ -101,7 +100,7 @@ class Engine:
         for current_project in list_of_projects_for_the_month:
 
             # ToDo: temp to try with 1
-            # if current_project != '4BIZ':
+            # if current_project != 'InnoForward':
             #     continue
 
             # 5.1. Temp variable if the project is EEN -----------------------------------------
@@ -120,6 +119,7 @@ class Engine:
 
             # Option I: 5.3. Read the data from the project file: not used ---------------------
             # Option II: 5.3. Insert rows in the project file: active ---------------------------
+            months_to_numbers = self.db_controller_object.get_months_to_numbers()
             month_number = months_to_numbers[month]
             sheet_name = f'{month_number}.{year}'
 
