@@ -181,9 +181,8 @@ class Engine:
                 vedomosti[project] = return_result[project]['Ʃ']
 
         print(vedomosti)    # {'4BIZ ': 80, 'BRIDGE-BS': 8, 'InnoForward': 80}
+        [print(key, value) for key, value in vedomosti.items()]
         
-
-
 
 
 
