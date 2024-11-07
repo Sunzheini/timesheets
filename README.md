@@ -1,7 +1,8 @@
 # Timesheets
 
 ## Purpose
-A program to automatically calculate monthly salary based on info in Excel files.
+A program to automatically calculate monthly work time and monthly salary based on info in Excel files also 
+prepare reports with predefined format.
 
 ## Structure
 The DB is a dictionary, where: 
